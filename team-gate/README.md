@@ -58,7 +58,7 @@ And then restart your server.
 
 ## Credits ##
 
-* [Rynoxx](http://steamcommunity.com/profiles/ "Rynoxx' Steam Profile"): Coding
+* [Rynoxx](http://steamcommunity.com/profiles/76561198004177027 "Rynoxx' Steam Profile"): Coding
 * [Ice Dragon](http://steamcommunity.com/profiles/76561197987470469/ "Ice Dragons Steam Profile"): Ideas
 * [PwndKilled](http://steamcommunity.com/profiles/76561198103106152/ "PwndKilleds Steam Profile"): Suggestions
 

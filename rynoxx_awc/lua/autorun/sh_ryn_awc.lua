@@ -20,9 +20,7 @@ print("This server is running AWC by Rynoxx. Source code is available at https:/
 
 AddCSLuaFile()
 
-if SERVER then
-	CreateConVar( "awc_allowed_usergroup", "superadmin", bit.bor( FCVAR_SERVER_CAN_EXECUTE, FCVAR_REPLICATED, FCVAR_ARCHIVE), "Which usergroup should be allowed to check and confiscate weapons using the Admin Check & Confiscate weapons addon?")
-end
+CreateConVar( "awc_allowed_usergroup", "superadmin", bit.bor( FCVAR_SERVER_CAN_EXECUTE, FCVAR_REPLICATED, FCVAR_ARCHIVE), "Which usergroup should be allowed to check and confiscate weapons using the Admin Check & Confiscate weapons addon?")
 
 local AdminCCConVar = GetConVar("awc_allowed_usergroup")
 
@@ -84,7 +82,7 @@ properties.Add("awc_contextmenu", {
 
 if CLIENT then
 	language.Add("awc_name", "Check & Confiscate Weapons")
-	language.Add("awc_info", "Press on the weapons to show you the options available.")
+	language.Add("awc_info", "Click on the weapons to show you the options available.")
 
 	language.Add("awc_remove_weapon", "Remove the weapon.")
 	language.Add("awc_take_weapon", "Take the weapon.")
