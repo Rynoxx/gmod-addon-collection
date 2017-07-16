@@ -1,0 +1,11 @@
+"AddonInfo"
+{
+	"name"				"Team Gates"
+	"version"			"1"
+	"up_date"			"2015-05-30"
+	"author_name"		"Rynoxx"
+	"author_email"		"rynoxx@grid-servers.net"
+	"author_url"		"http://grid-servers.net"
+	"info"				"An entity which only allows certain players, npcs, vehicles or other entities to pass through it"
+	"override"			"1"
+}
