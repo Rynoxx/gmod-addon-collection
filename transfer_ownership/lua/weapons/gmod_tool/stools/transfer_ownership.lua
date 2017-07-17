@@ -28,17 +28,78 @@ TOOL.Information = {
 
 TOOL.ClientConVar[ "selected_userid" ] = ""
 
-local function doGiveOwnership(ent, plyFrom, plyTo, bWasUndone)
-	print(bWasUndone)
-	if !IsValid(ent) or !IsValid(plyFrom) or !IsValid(plyTo) then return false end
+CreateConVar( "transfer_ownership_check_ownership", 1, bit.bor( FCVAR_SERVER_CAN_EXECUTE, FCVAR_REPLICATED, FCVAR_ARCHIVE), "Should the tool check if the user is the owner of the entity or if they have the right to use a toolgun on it? (e.g. on props of their friends)")
+CreateConVar( "transfer_ownership_admin_check_ownership", 0, bit.bor( FCVAR_SERVER_CAN_EXECUTE, FCVAR_REPLICATED, FCVAR_ARCHIVE), "Should the tool check if the user is the owner of the entity or if they have the right to use a toolgun on it for admins?")
+CreateConVar( "transfer_ownership_admin_usergroup", "superadmin", bit.bor( FCVAR_SERVER_CAN_EXECUTE, FCVAR_REPLICATED, FCVAR_ARCHIVE), "To which usergroup should the 'transfer_ownership_admin_check_ownership' convar apply?")
 
-	local owner = (FPP and FPP.entGetOwner(ent)) or (ent.CPPIGetOwner and ent:CPPIGetOwner()) or ent:GetOwner()
+local TOCO = GetConVar("transfer_ownership_check_ownership")
+local TOACO = GetConVar("transfer_ownership_admin_check_ownership")
+local TOAU = GetConVar("transfer_ownership_admin_usergroup")
 
-	if owner ~= plyFrom then
-		return false
+local function isUserGroup(ply, usergroup)
+	if ply.ASS_HasLevel and ply:ASS_HasLevel(usergroup) then
+		return true
 	end
 
-	if !bWasUndone then
+	if ply.CheckGroup and ply:CheckGroup(usergroup) then
+		return true
+	end
+
+	if ply.EV_IsRank and ply.EV_IsRank(usergroup) then
+		return true
+	end
+
+	return ply:IsUserGroup(usergroup)
+end
+
+local function doGiveOwnership(ent, plyFrom, plyTo, bWasUndone)
+	if type(ent) ~= "table" then
+		ent = { ent }
+	end
+
+	for k, v in pairs(ent) do
+		if not IsValid(v) or not IsValid(plyFrom) or not IsValid(plyTo) then return false end
+
+		local owner = (FPP and FPP.entGetOwner(v)) or (v.CPPIGetOwner and v:CPPIGetOwner()) or v:GetOwner()
+
+		if owner == plyTo then
+			return false
+		end
+
+		if not TOCO:GetBool() or (TOACO:GetBool() and ((plyFrom.CheckGroup and plyFrom:CheckGroup(TOAU:GetString())) or plyFrom:IsUserGroup(TOAU:GetString()))) then
+			local canTool = (v.CPPICanTool and v:CPPICanTool(plyFrom, "transfer_ownership"))
+
+			if not canTool then
+				if not DarkRP then
+					plyFrom:SendLua([[notification.AddLegacy("You're not allowed to transfer ownership of that entity!", NOTIFY_ERROR, 5)]])
+				else
+					DarkRP.notify(plyFrom, NOTIFY_ERROR, 5, "You're not allowed to transfer ownership of that entity!")
+				end
+
+				return false
+			end
+		else
+			if owner ~= plyFrom then
+				if not DarkRP then
+					plyFrom:SendLua([[notification.AddLegacy("You can only transfer your own entities!", NOTIFY_ERROR, 5)]])
+				else
+					DarkRP.notify(plyFrom, NOTIFY_ERROR, 5, "You can only transfer your own entities!")
+				end
+
+				return false
+			end
+		end
+
+		if v.CPPISetOwner then
+			v:CPPISetOwner(plyTo)
+		end
+
+		if v.dt and v.dt.owning_ent then
+			v.dt.owning_ent = plyTo
+		end
+	end
+
+	if not bWasUndone then
 		undo.Create("transfer_ownership")
 			local undoE = ent
 			local undoP = plyTo
@@ -50,25 +111,17 @@ local function doGiveOwnership(ent, plyFrom, plyTo, bWasUndone)
 		undo.Finish()
 	end
 
-	if ent.CPPISetOwner then
-		ent:CPPISetOwner(plyTo)
-	end
-
-	if ent.dt and ent.dt.owning_ent then
-		ent.dt.owning_ent = plyTo
-	end
-
 	return true
 end
 
 ---
 -- Transfer ownership of single entity
 function TOOL:LeftClick(tr)
-	if !IsValid(tr.Entity) then return end
+	if not IsValid(tr.Entity) then return end
 
 	local ply = Player( self:GetClientInfo("selected_userid") )
 
-	if !IsValid(ply) then
+	if not IsValid(ply) then
 		if CLIENT then
 			notification.AddLegacy("No valid player selected!", NOTIFY_ERROR, 5)
 		end
@@ -86,11 +139,11 @@ end
 ---
 -- Transfer ownership of constrained entities
 function TOOL:RightClick(tr)
-	if !IsValid(tr.Entity) then return end
+	if not IsValid(tr.Entity) then return end
 
 	local ply = Player(self:GetClientInfo("selected_userid") )
 
-	if !IsValid(ply) then
+	if not IsValid(ply) then
 		if CLIENT then
 			notification.AddLegacy("No valid player selected!", NOTIFY_ERROR, 5)
 		end
@@ -101,9 +154,12 @@ function TOOL:RightClick(tr)
 	if SERVER then
 		local ents = constraint.GetAllConstrainedEntities( tr.Entity )
 
+		doGiveOwnership(ents, self:GetOwner(), ply)
+		--[[
 		for k, v in pairs(ents) do
 			doGiveOwnership(ents[v], self:GetOwner(), ply)
 		end
+		--]]
 
 		ents = nil
 	end
@@ -122,7 +178,6 @@ function TOOL.BuildCPanel( CPanel )
 	listBox.players = {}
 	listBox.OnSelect = function(me, item)
 		RunConsoleCommand("transfer_ownership_selected_userid", item.player:UserID())
-		print(item.player)
 	end
 
 	listBox:SetTall(480)
@@ -140,10 +195,10 @@ function TOOL.BuildCPanel( CPanel )
 				me.players = playerList
 
 				for k, v in pairs(me.players) do
-					if v ~= localplayer then
+					--if v ~= localplayer then
 						local item = me:AddItem(v:Nick())
 						item.player = v
-					end
+					--end
 				end
 
 			end
