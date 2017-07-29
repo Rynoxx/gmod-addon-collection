@@ -49,6 +49,14 @@ local function isUserGroup(ply, usergroup)
 		return true
 	end
 
+	if string.lower(usergroup) == "superadmin" and ply:IsSuperAdmin() then
+		return true
+	end
+
+	if string.lower(usergroup) == "admin" and ply:IsAdmin() then
+		return true
+	end
+
 	return ply:IsUserGroup(usergroup)
 end
 
@@ -66,7 +74,7 @@ local function doGiveOwnership(ent, plyFrom, plyTo, bWasUndone)
 			return false
 		end
 
-		if not TOCO:GetBool() or (TOACO:GetBool() and ((plyFrom.CheckGroup and plyFrom:CheckGroup(TOAU:GetString())) or plyFrom:IsUserGroup(TOAU:GetString()))) then
+		if not TOCO:GetBool() or (not TOACO:GetBool() and ((plyFrom.CheckGroup and plyFrom:CheckGroup(TOAU:GetString())) or plyFrom:IsUserGroup(TOAU:GetString()))) then
 			local canTool = (v.CPPICanTool and v:CPPICanTool(plyFrom, "transfer_ownership"))
 
 			if not canTool then

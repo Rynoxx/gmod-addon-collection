@@ -14,4 +14,4 @@ Use the convar `transfer_ownership_check_ownership` to choose whether to check s
 The convar `transfer_ownership_admin_check_ownership` is the same as above, but only applies to admins so that admins can change ownership of players props or disconnected players props. This convar is ignored if the above is set to `0`.
 
 The convar `transfer_ownership_admin_usergroup` sets which usergroup that should take advantage of the above admin check.
-E.g. `transfer_ownership_admin_usergroup "superadmin"` allows only superadmins (and on ULX, exsto and AssMod any group that inherits from it)
+E.g. `transfer_ownership_admin_usergroup "superadmin"` allows only superadmins (and on ULX, exsto and AssMod any group that inherits from it. "admin" and "superadmin" will use the IsAdmin and IsSuperAdmin checks respectively.)

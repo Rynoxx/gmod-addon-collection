@@ -172,8 +172,6 @@ local function shouldPlayerCollide(ent, ply, MaxDist)
 	if utimeExists and ((ply:GetUTimeTotalTime()/60/60) > ent:GetMinPlayTime() and ent:GetMinPlayTime() > 0) then
 		return false
 	end
-
-	return false
 end
 
 hook.Add("RynGates_ShouldPlayerCollide", "RynGates_DefaultShouldPlayerCollide", shouldPlayerCollide)
