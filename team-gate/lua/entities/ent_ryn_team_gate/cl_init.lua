@@ -284,9 +284,11 @@ net.Receive("RynoxxGateMenu", function(len)
 
 			local ulibGroups = {}
 
-			for i = 1, table.Count(RynGateMenu.ULibPanels.groups) do
-				if RynGateMenu.ULibPanels.groups[i]:GetChecked() then
-					table.insert(ulibGroups, RynGateMenu.ULibPanels.groups[i].group)
+			if RynGateMenu.ULibPanels then
+				for i = 1, table.Count(RynGateMenu.ULibPanels.groups) do
+					if RynGateMenu.ULibPanels.groups[i]:GetChecked() then
+						table.insert(ulibGroups, RynGateMenu.ULibPanels.groups[i].group)
+					end
 				end
 			end
 
