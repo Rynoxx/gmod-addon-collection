@@ -3,7 +3,7 @@ I am
 - [ ] Giving a suggestion  
 
 ---
-If you're reporing a bug, please answer the following questions (if not, this section can be removed):  
+If you're reporting a bug, please answer the following questions (if not, this section can be removed):  
 Are there any lua errors? If so, include them below.  
 
 What is the desired behaviour? And what is the current behaviour?  
