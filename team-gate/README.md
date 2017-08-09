@@ -18,6 +18,9 @@ Do note that the menu uses the default Garry's Mod derma skin (or DarkRP if it's
 A video demonstration of the addon is available on [Youtube](http://youtu.be/_bSOgi1ogT8 "Video on youtube").  
 _Do note that the video shows the 1.0.1 version of the addon, newer version include updates to the menu_
 
+
+[Steam Workshop page](http://steamcommunity.com/sharedfiles/filedetails/?id=1073652620)
+
 ---------------------------------------
 
 ## Table of Content ##

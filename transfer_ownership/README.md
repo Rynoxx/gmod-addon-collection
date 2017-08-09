@@ -15,3 +15,5 @@ The convar `transfer_ownership_admin_check_ownership` is the same as above, but 
 
 The convar `transfer_ownership_admin_usergroup` sets which usergroup that should take advantage of the above admin check.
 E.g. `transfer_ownership_admin_usergroup "superadmin"` allows only superadmins (and on ULX, exsto and AssMod any group that inherits from it. "admin" and "superadmin" will use the IsAdmin and IsSuperAdmin checks respectively.)
+
+[Steam Workshop page](http://steamcommunity.com/sharedfiles/filedetails/?id=1078491590)
