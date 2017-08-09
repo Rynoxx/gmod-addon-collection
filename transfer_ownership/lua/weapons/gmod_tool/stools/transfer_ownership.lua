@@ -122,6 +122,57 @@ local function doGiveOwnership(ent, plyFrom, plyTo, bWasUndone)
 	return true
 end
 
+local function simphysCompatability(entity)
+	if CLIENT then return {} end
+
+	if entity:GetClass() == "gmod_sent_vehicle_fphysics_base" then
+		local simphysEnts = {}
+
+		if IsValid(entity.DriverSeat) then
+			table.insert(simphysEnts, entity.DriverSeat)
+		end
+
+		if IsValid(entity.MassOffset) then
+			table.Add(simphysEnts, entity.MassOffset)
+		end
+
+		if IsValid(entity.SteerMaster) then
+			table.insert(simphysEnts, entity.SteerMaster)
+		end
+
+		if IsValid(entity.SteerMaster2) then
+			table.insert(simphysEnts, entity.SteerMaster2)
+		end
+
+		if entity.pSeat then
+			for i = 1, table.Count(entity.pSeat) do
+				if IsValid(entity.pSeat[i]) then
+					table.insert(simphysEnts, entity.pSeat[i])
+				end
+			end
+		end
+
+		if entity.GhostWheels then
+			for i = 1, table.Count(entity.GhostWheels) do
+				if IsValid(entity.GhostWheels[i]) then
+					table.insert(simphysEnts, entity.GhostWheels[i])
+				end
+			end
+		end
+		if entity.Wheels then
+			for i = 1, table.Count(entity.Wheels) do
+				if IsValid(entity.Wheels[i]) then
+					table.insert(simphysEnts, entity.Wheels[i])
+				end
+			end
+		end
+
+		return simphysEnts
+	else
+		return {}
+	end
+end
+
 ---
 -- Transfer ownership of single entity
 function TOOL:LeftClick(tr)
@@ -138,7 +189,12 @@ function TOOL:LeftClick(tr)
 	end
 
 	if SERVER then
-		doGiveOwnership(tr.Entity, self:GetOwner(), ply)
+		local targetEnts = { tr.Entity }
+
+		local simphysEnts = simphysCompatability(tr.Entity)
+		table.Add(targetEnts, simphysEnts)
+
+		doGiveOwnership(targetEnts, self:GetOwner(), ply)
 	end
 
 	return true
@@ -160,9 +216,12 @@ function TOOL:RightClick(tr)
 	end
 
 	if SERVER then
-		local ents = constraint.GetAllConstrainedEntities( tr.Entity )
+		local targetEnts = constraint.GetAllConstrainedEntities( tr.Entity )
 
-		doGiveOwnership(ents, self:GetOwner(), ply)
+		local simphysEnts = simphysCompatability(tr.Entity)
+		table.Add(targetEnts, simphysEnts)
+
+		doGiveOwnership(targetEnts, self:GetOwner(), ply)
 		--[[
 		for k, v in pairs(ents) do
 			doGiveOwnership(ents[v], self:GetOwner(), ply)
