@@ -65,13 +65,15 @@ local function doGiveOwnership(ent, plyFrom, plyTo, bWasUndone)
 		ent = { ent }
 	end
 
+	local success = true
+
 	for k, v in pairs(ent) do
-		if not IsValid(v) or not IsValid(plyFrom) or not IsValid(plyTo) then return false end
+		if not IsValid(v) or not IsValid(plyFrom) or not IsValid(plyTo) then continue end
 
 		local owner = (FPP and FPP.entGetOwner(v)) or (v.CPPIGetOwner and v:CPPIGetOwner()) or v:GetOwner()
 
 		if owner == plyTo then
-			return false
+			continue
 		end
 
 		if not TOCO:GetBool() or (not TOACO:GetBool() and ((plyFrom.CheckGroup and plyFrom:CheckGroup(TOAU:GetString())) or plyFrom:IsUserGroup(TOAU:GetString()))) then
@@ -84,7 +86,8 @@ local function doGiveOwnership(ent, plyFrom, plyTo, bWasUndone)
 					DarkRP.notify(plyFrom, NOTIFY_ERROR, 5, "You're not allowed to transfer ownership of that entity!")
 				end
 
-				return false
+				success = false
+				continue
 			end
 		else
 			if owner ~= plyFrom then
@@ -94,7 +97,8 @@ local function doGiveOwnership(ent, plyFrom, plyTo, bWasUndone)
 					DarkRP.notify(plyFrom, NOTIFY_ERROR, 5, "You can only transfer your own entities!")
 				end
 
-				return false
+				success = false
+				continue
 			end
 		end
 
@@ -104,6 +108,14 @@ local function doGiveOwnership(ent, plyFrom, plyTo, bWasUndone)
 
 		if v.dt and v.dt.owning_ent then
 			v.dt.owning_ent = plyTo
+		end
+	end
+
+	if success then
+		if not DarkRP then
+			plyFrom:SendLua([[notification.AddLegacy("Successfully transfered ownership!", NOTIFY_ERROR, 5)]])
+		else
+			DarkRP.notify(plyFrom, NOTIFY_ERROR, 5, "Successfully transfered ownership!")
 		end
 	end
 
@@ -133,7 +145,7 @@ local function simphysCompatability(entity)
 		end
 
 		if IsValid(entity.MassOffset) then
-			table.Add(simphysEnts, entity.MassOffset)
+			table.insert(simphysEnts, entity.MassOffset)
 		end
 
 		if IsValid(entity.SteerMaster) then
@@ -159,6 +171,7 @@ local function simphysCompatability(entity)
 				end
 			end
 		end
+
 		if entity.Wheels then
 			for i = 1, table.Count(entity.Wheels) do
 				if IsValid(entity.Wheels[i]) then
@@ -167,6 +180,11 @@ local function simphysCompatability(entity)
 			end
 		end
 
+		if entity.ColorableProps then
+			if IsValid(entity.ColorableProps[i]) then
+				table.insert(simphysEnts, entity.ColorableProps[i])
+			end
+		end
 		return simphysEnts
 	else
 		return {}
@@ -222,13 +240,6 @@ function TOOL:RightClick(tr)
 		table.Add(targetEnts, simphysEnts)
 
 		doGiveOwnership(targetEnts, self:GetOwner(), ply)
-		--[[
-		for k, v in pairs(ents) do
-			doGiveOwnership(ents[v], self:GetOwner(), ply)
-		end
-		--]]
-
-		ents = nil
 	end
 
 	return true
