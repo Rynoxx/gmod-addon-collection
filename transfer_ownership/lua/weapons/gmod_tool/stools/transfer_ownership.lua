@@ -196,7 +196,17 @@ end
 function TOOL:LeftClick(tr)
 	if not IsValid(tr.Entity) then return end
 
-	local ply = Player( self:GetClientInfo("selected_userid") )
+    local selected_userid = self:GetClientInfo("selected_userid")
+
+    if selected_userid == nil or selected_userid == '' then
+        if CLIENT then
+            notification.AddLegacy("No valid player selected!", NOTIFY_ERROR, 5)
+		end
+
+		return false
+    end
+
+	local ply = Player(selected_userid)
 
 	if not IsValid(ply) then
 		if CLIENT then
@@ -223,7 +233,17 @@ end
 function TOOL:RightClick(tr)
 	if not IsValid(tr.Entity) then return end
 
-	local ply = Player(self:GetClientInfo("selected_userid") )
+    local selected_userid = self:GetClientInfo("selected_userid")
+
+    if selected_userid == nil or selected_userid == '' then
+        if CLIENT then
+			notification.AddLegacy("No valid player selected!", NOTIFY_ERROR, 5)
+		end
+
+		return false
+    end
+
+	local ply = Player(selected_userid)
 
 	if not IsValid(ply) then
 		if CLIENT then
